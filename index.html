@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="군 적금 계산기를 사용해 장병내일준비적금의 예상 수령액을 손쉽게 계산할 수 있습니다.">
+    <title>군 적금 계산기</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F1F3F5;
+            padding: 20px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.75em;
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        input, button {
+            font-size: 1.2em;
+            padding: 5px;
+        }
+
+        button {
+            background-color: #1864AB;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        @media (min-width: 576px) {
+            body {
+                padding: 50px;
+            }
+          
+            h1 {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>군 적금 계산기</h1>
+    <form id="calculator">
+        <label for="monthly_deposit">월 적금 납입액:</label>
+        <input type="text" id="monthly_deposit" value="400,000" placeholder="월 적금 납입액" required><br>
+        <label for="start">첫 적금 납입일:</label>
+        <input type="date" id="start_date" required><br>
+        <label for="end_date">전역/소집해제 일:</label>
+        <input type="date" id="end_date" required><br>
+        <button type="submit">계산하기</button>
+    </form>
+    <p id="result">예상 수령액: 0원</p>
+    <br>
+    <p>장병내일준비적금의 예상 수령액을 손쉽게 계산할 수 있습니다.</p>
+    <p>장병내일준비적금의 월 납입액과 첫 납입일,전역일자를 입력하시면 예상 수령액이 계산됩니다.</p>
+    <p>2022년 납입액 : 33% 매칭 지원금</p>
+    <p>2023년 납입액 : 71% 매칭 지원금</p>
+    <script>
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function removeCommas(x) {
+            return x.replace(/,/g, '');
+        }
+
+        document.getElementById("monthly_deposit").addEventListener("input", function (event) {
+            const input = event.target.value;
+            const withoutCommas = removeCommas(input);
+            const withCommas = numberWithCommas(withoutCommas);
+            this.value = withCommas;
+        });
+
+        document.getElementById("calculator").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const monthlyDeposit = parseFloat(removeCommas(document.getElementById("monthly_deposit").value));
+            const startDate = new Date(document.getElementById("start_date").value);
+            const endDate = new Date(document.getElementById("end_date").value);
+
+            const totalAmount = calculateTotalAmount(monthlyDeposit, startDate, endDate);
+
+            document.getElementById("result").innerHTML = `총 수령액: ${numberWithCommas(totalAmount)}원`;
+        });
+
+        function calculateTotalAmount(monthlyDeposit, startDate, endDate) {
+            const interestRate = 0.05;
+            const endDateYear = endDate.getFullYear();
+            const startDateYear = startDate.getFullYear();
+            const depositMonths = Math.floor((endDate - startDate) / (30 * 24 * 60 * 60 * 1000));
+
+            let accumulatedTotal = 0;
+
+            for (let i = 0; i <= depositMonths; i++) {
+                const currentYear = startDate.getFullYear() + Math.floor((startDate.getMonth() + i) / 12);
+                const currentMonth = (startDate.getMonth() + i) % 12;
+                let matchingRate = endDateYear === 2022 ? 0.33 : 0.71;
+
+                if (currentYear === 2022) {
+                    matchingRate = 0.33;
+                } else if (currentYear === 2023) {
+                    matchingRate = 0.71;
+                }
+
+                const currentDate = new Date(currentYear, currentMonth);
+                const nextDate = new Date(currentYear, currentMonth + 1);
+
+                if (endDate >= currentDate && endDate < nextDate) {
+                  if (endDate.getDate() >= startDate.getDate()) {
+                    i = depositMonths;
+                  } else {
+                    break;
+                  }
+                }
+
+                accumulatedTotal += monthlyDeposit * (1 + interestRate / 12) ** i;
+                accumulatedTotal += monthlyDeposit * matchingRate * (1 + interestRate / 12) ** i;
+            }
+            return Math.round(accumulatedTotal);
+        }
+    </script>
+</body>
+</html>
