@@ -99,40 +99,35 @@
         });
 
         function calculateTotalAmount(monthlyDeposit, startDate, endDate) {
-            const interestRate = 0.05;
-            const endDateYear = endDate.getFullYear();
-            const startDateYear = startDate.getFullYear();
-            const depositMonths = Math.floor((endDate - startDate) / (30 * 24 * 60 * 60 * 1000));
+    const interestRate = 0.05;
+    const endDateYear = endDate.getFullYear();
+    const startDateYear = startDate.getFullYear();
 
-            let accumulatedTotal = 0;
+    const depositMonths = ((endDateYear - startDateYear) * 12) + (endDate.getMonth() - startDate.getMonth());
+    let accumulatedTotal = 0;
+    
+    for (let i = 0; i <= depositMonths; i++) {
+        const currentYear = startDate.getFullYear() + Math.floor((startDate.getMonth() + i) / 12);
+        const currentMonth = (startDate.getMonth() + i) % 12;
+        let matchingRate = endDateYear === 2022 ? 0.33 : 0.71;
 
-            for (let i = 0; i <= depositMonths; i++) {
-                const currentYear = startDate.getFullYear() + Math.floor((startDate.getMonth() + i) / 12);
-                const currentMonth = (startDate.getMonth() + i) % 12;
-                let matchingRate = endDateYear === 2022 ? 0.33 : 0.71;
-
-                if (currentYear === 2022) {
-                    matchingRate = 0.33;
-                } else if (currentYear === 2023) {
-                    matchingRate = 0.71;
-                }
-
-                const currentDate = new Date(currentYear, currentMonth);
-                const nextDate = new Date(currentYear, currentMonth + 1);
-
-                if (endDate >= currentDate && endDate < nextDate) {
-                  if (endDate.getDate() >= startDate.getDate()) {
-                    i = depositMonths;
-                  } else {
-                    break;
-                  }
-                }
-
-                accumulatedTotal += monthlyDeposit * (1 + interestRate / 12) ** i;
-                accumulatedTotal += monthlyDeposit * matchingRate * (1 + interestRate / 12) ** i;
-            }
-            return Math.round(accumulatedTotal);
+        if (currentYear === 2022) {
+          matchingRate = 0.33;
+        } else if (currentYear === 2023) {
+          matchingRate = 0.71;
         }
+
+        const currentDate = new Date(currentYear, currentMonth);
+        const nextDate = new Date(currentYear, currentMonth + 1);
+
+        accumulatedTotal += monthlyDeposit * (1 + interestRate / 12) ** i;
+        accumulatedTotal += monthlyDeposit * matchingRate * (1 + interestRate / 12) ** i;
+    }
+    return Math.round(accumulatedTotal);
+}
+
+
+
     </script>
 </body>
 </html>
