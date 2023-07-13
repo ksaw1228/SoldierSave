@@ -65,9 +65,10 @@
         <button type="submit">계산하기</button>
     </form>
     <p id="result">예상 수령액: 0원</p>
+    <p id="warning" style="display:none;color: red;">주의: 마지막 달의 적금 자동이체 날짜가 전역일 이후입니다.<br>이 경우, 마지막 달에는 자동 이체가 되지 않을 수 있습니다.</p>
     <br>
-    <p>장병내일준비적금의 예상 수령액을 손쉽게 계산할 수 있습니다.</p>
-    <p>장병내일준비적금의 월 납입액과 첫 납입일,전역일자를 입력하시면 예상 수령액이 계산됩니다.</p>
+    <p>장병내일준비적금의 수령액을 손쉽게 계산할 수 있습니다.</p>
+    <p>장병내일준비적금의 월 납입액과 첫 납입일,전역일자를 입력하시면 예상 수령액이 계산됩니다.</p><br>
     <p>2022년 납입액 : 33% 매칭 지원금</p>
     <p>2023년 납입액 : 71% 매칭 지원금</p>
     <script>
@@ -96,9 +97,15 @@
             const totalAmount = calculateTotalAmount(monthlyDeposit, startDate, endDate);
 
             document.getElementById("result").innerHTML = `예상 수령액: ${numberWithCommas(totalAmount)}원`;
+
+            if (startDate.getDate() >= endDate.getDate()) {
+                document.getElementById("warning").style.display = "block";
+            } else {
+                document.getElementById("warning").style.display = "none";
+            }
         });
 
-        function calculateTotalAmount(monthlyDeposit, startDate, endDate) {
+function calculateTotalAmount(monthlyDeposit, startDate, endDate) {
     const interestRate = 0.05;
     const endDateYear = endDate.getFullYear();
     const startDateYear = startDate.getFullYear();
