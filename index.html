@@ -81,6 +81,8 @@
          입력하시면 예상 수령액이 계산됩니다.</p><br>
     <p>2022년 납입액 : 33% 매칭 지원금</p>
     <p>2023년 납입액 : 71% 매칭 지원금</p>
+    <p>2024년 납입액 : 100% 매칭 지원금 (시행예정)</p>
+    <p>2025년 납입액 : 125% 매칭 지원금 (시행예정)</p>
     <script>
         function numberWithCommas(x) {
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -115,7 +117,7 @@
             }
         });
 
-function calculateTotalAmount(monthlyDeposit, startDate, endDate) {
+        function calculateTotalAmount(monthlyDeposit, startDate, endDate) {
     const interestRate = 0.05;
     const endDateYear = endDate.getFullYear();
     const startDateYear = startDate.getFullYear();
@@ -126,12 +128,17 @@ function calculateTotalAmount(monthlyDeposit, startDate, endDate) {
     for (let i = 0; i <= depositMonths; i++) {
         const currentYear = startDate.getFullYear() + Math.floor((startDate.getMonth() + i) / 12);
         const currentMonth = (startDate.getMonth() + i) % 12;
-        let matchingRate = endDateYear === 2022 ? 0.33 : 0.71;
+        
+        let matchingRate;
 
         if (currentYear === 2022) {
           matchingRate = 0.33;
         } else if (currentYear === 2023) {
           matchingRate = 0.71;
+        } else if (currentYear === 2024) {
+          matchingRate = 1;
+        } else if(currentYear === 2025) {
+            matchingRate = 1.25;
         }
 
         const currentDate = new Date(currentYear, currentMonth);
@@ -142,6 +149,7 @@ function calculateTotalAmount(monthlyDeposit, startDate, endDate) {
     }
     return Math.round(accumulatedTotal);
 }
+
 
 
 
